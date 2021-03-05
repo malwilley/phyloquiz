@@ -1,0 +1,60 @@
+@use "sass:color";
+
+$primary-600: #133018;
+$primary-500: #265d34;
+$primary-300: #265d34;
+$primary-90: #4fba74;
+$primary-60: #4fba74;
+$primary-40: #9fd9bc;
+$primary-30: #bae4d2;
+$primary-20: #e3f4ed;
+$primary-10: #f1fbf0;
+
+$dark-600: #2a3721;
+$dark-500: #363f36;
+$dark-400: #44503c;
+$dark-300: #55614e;
+$dark-100: #778272;
+$dark-80: #919b8d;
+$dark-50: #b4bcb1;
+$dark-40: #ced5cc;
+$dark-20: #e0e6de;
+$dark-10: #f2f7f0;
+
+$error-300: #db324d;
+$error-100: #db324d;
+$error-30: #f1b6b2;
+
+$link-blue: #0a85ae;
+
+$text-color-dark: $dark-600;
+$text-color-light: $dark-100;
+$text-color-error: $error-300;
+$text-color-success: $primary-60;
+
+$correct-color: $primary-60;
+$incorrect-color: $error-300;
+
+$light-hover: color.scale($dark-10, $lightness: 50%);
+$light-border-color: rgba($dark-20, 0.8);
+
+$serif-font: 'Vollkorn', serif;
+$sans-serif-font: 'Open Sans', sans-serif;
+
+$bg-image-filter: url(#bg-image-blur) brightness(95%) saturate(95%);
+
+$box-shadow-small: 0 0.15rem 0.3rem 0 rgba($dark-600, 0.25);
+$box-shadow-card: inset 0 0 0 1px $light-border-color,
+  0 1rem 1rem -1rem rgba($dark-600, 0.05),
+  0 1.5rem 1.5rem 0 rgba($dark-600, 0.05);
+
+$sans-serif-size-small: 0.7rem;
+$sans-serif-size-medium: 1rem;
+
+@mixin text-style-caps {
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: $sans-serif-size-small;
+  font-family: $sans-serif-font;
+}
