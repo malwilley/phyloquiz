@@ -8,6 +8,8 @@
   import isSmoothScrollingSupported from '../../../utils/isSmoothScrollingSupported'
   import InlineTreeViewer from './InlineTreeViewer.svelte'
   import isPhoneViewport from '../../../utils/isPhoneViewport'
+  import Check from '../../../components/icons/Check.svelte'
+  import Times from '../../../components/icons/Times.svelte'
 
   onMount(() => {
     if (isSmoothScrollingSupported()) {
@@ -58,9 +60,15 @@
   </div>
 
   {#if correct}
-    <div class="correct">Correct!</div>
+    <div class="correct">
+      <div class="symbol" aria-hidden><Check size={16} /></div>
+      Correct!
+    </div>
   {:else}
-    <div class="incorrect">Incorrect.</div>
+    <div class="incorrect">
+      <div class="symbol" aria-hidden><Times size={16} /></div>
+      Incorrect.
+    </div>
   {/if}
 
   <section>
@@ -115,18 +123,45 @@
     font-size: 2rem;
     font-weight: bold;
     margin-top: 2rem;
+    display: flex;
+    align-items: center;
 
     @include for-tablet-landscape-up {
       margin-top: 4rem;
+    }
+
+    .symbol {
+      height: 2.25rem;
+      width: 2.25rem;
+      border-radius: 50%;
+      margin-right: 1rem;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: white;
+
+      :global(svg) {
+        stroke-width: 3;
+      }
     }
   }
 
   .correct {
     color: $correct-color;
+
+    .symbol {
+      background: $correct-color;
+    }
   }
 
   .incorrect {
     color: $incorrect-color;
+
+    .symbol {
+      background: $incorrect-color;
+    }
   }
 
   .cards-container {
