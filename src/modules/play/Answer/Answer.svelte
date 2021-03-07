@@ -7,6 +7,17 @@
   import { onMount } from 'svelte'
   import isSmoothScrollingSupported from '../../../utils/isSmoothScrollingSupported'
   import InlineTreeViewer from './InlineTreeViewer.svelte'
+  import isPhoneViewport from '../../../utils/isPhoneViewport'
+
+  onMount(() => {
+    if (isSmoothScrollingSupported()) {
+      window.scroll({ top: 0, behavior: 'smooth' })
+    } else {
+      window.scroll(0, 0)
+    }
+  })
+
+  const shouldShowSelectedFirst = isPhoneViewport()
 
   const {
     correct,
@@ -17,28 +28,33 @@
   } = $currentAnswer.data ?? {}
   const { leaf1, leaf2, leafCompare } = $currentQuestion?.data ?? {}
 
-  onMount(() => {
-    if (isSmoothScrollingSupported()) {
-      window.scroll({ top: 0, behavior: 'smooth' })
-    } else {
-      window.scroll(0, 0)
+  const leaf1Props = {
+    leaf: leaf1,
+    correct: leaf1.id === selected.leaf.id ? correct : !correct,
+    selected: leaf1.id === selected.leaf.id,
+  }
+  const leaf2Props = {
+    leaf: leaf2,
+    correct: !leaf1Props.correct,
+    selected: !leaf1Props.selected,
+  }
+
+  const getCardProps = () => {
+    const cardProps = [leaf1Props, leaf2Props]
+
+    if (!shouldShowSelectedFirst || leaf1Props.selected) {
+      return cardProps
     }
-  })
+
+    return cardProps.reverse()
+  }
 </script>
 
 <CenterContent>
   <div class="cards-container">
-    <AnswerSpeciesCard
-      leaf={leaf1}
-      correct={leaf1.id === selected.leaf.id ? correct : !correct}
-      selected={leaf1.id === selected.leaf.id}
-    />
+    <AnswerSpeciesCard {...getCardProps()[0]} />
     <AnswerSpeciesCard leaf={leafCompare} />
-    <AnswerSpeciesCard
-      leaf={leaf2}
-      correct={leaf2.id === selected.leaf.id ? correct : !correct}
-      selected={leaf2.id === selected.leaf.id}
-    />
+    <AnswerSpeciesCard {...getCardProps()[1]} />
   </div>
 
   {#if correct}

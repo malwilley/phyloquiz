@@ -8,7 +8,7 @@ export const fetchFeaturedNodes = async () => {
   })
 
   if (!response.ok) {
-    throw new Error('')
+    throw new Error('Failed to fetch featured quizzes.')
   }
 
   const data = await response.json()

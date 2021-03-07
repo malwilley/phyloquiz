@@ -151,6 +151,11 @@
   .quiz-card {
     position: relative;
     height: auto;
+    transition: 200ms box-shadow ease-out;
+
+    &:hover {
+      box-shadow: inset 0 0 0 1px $primary-30, $box-shadow-card-no-outline;
+    }
   }
 
   .quiz-card-text {
