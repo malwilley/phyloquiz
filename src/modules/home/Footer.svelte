@@ -1,10 +1,15 @@
 <footer>
   <div>
     <strong>PhyloQuiz</strong> is an experimental quiz generator for educators,
-    biology nerds, or anyone who likes kiling time. See my other work at
+    biology nerds, or anyone who enjoys wasting time. See my other work at
     <a href="https://malachi.dev/" target="_blank" rel="noopener noreferrer"
       >malachi.dev</a
-    >.
+    >, or view the
+    <a
+      href="https://github.com/malwilley/phyloquiz"
+      target="_blank"
+      rel="noopener noreferrer">source code</a
+    > on GitHub.
   </div>
   <hr />
   <div>
