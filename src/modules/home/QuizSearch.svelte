@@ -61,7 +61,7 @@
 
   const selectItem = (item) => {
     query = item.vernacular
-    navigate(`/play/${item.ott}`)
+    navigate(`/generate/${item.ott}`)
   }
 
   const selectHighlightedItem = () => {
@@ -200,7 +200,16 @@
         </div>
       {/if}
     {:else if $searchedNodes.type === 'error'}
-      <div>Error! {$searchedNodes?.message}</div>
+      <div class="flyout-item info ">
+        <p>
+          Failed to retrieve search results for <strong
+            >"{lastSearchedQuery}"</strong
+          >
+        </p>
+        <p class="note">
+          {$searchedNodes.message}
+        </p>
+      </div>
     {/if}
   </ul>
 </div>

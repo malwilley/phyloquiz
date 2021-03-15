@@ -1,19 +1,10 @@
 import { pick } from 'ramda'
+import { httpGet } from './common'
 
 export const fetchFeaturedNodes = async () => {
-  const response = await fetch('/api/featured', {
-    headers: {
-      Accept: 'application/json',
-    },
-  })
+  const nodes = await httpGet('/api/featured_nodes')
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch featured quizzes.')
-  }
-
-  const data = await response.json()
-
-  return data.nodes.map((node) => ({
+  return nodes.map((node) => ({
     ...pick(['id', 'ott', 'name', 'popularity', 'images', 'vernacular'], node),
     numSpecies: node.num_species,
   }))

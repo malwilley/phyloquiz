@@ -8,6 +8,7 @@ import preprocess from 'svelte-preprocess'
 import copy from 'rollup-plugin-copy'
 import { babel } from '@rollup/plugin-babel'
 import smartAsset from 'rollup-plugin-smart-asset'
+import replace from '@rollup/plugin-replace'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -94,6 +95,9 @@ export default {
     resolve({
       browser: true,
       dedupe: ['svelte'],
+    }),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
     commonjs(),
 

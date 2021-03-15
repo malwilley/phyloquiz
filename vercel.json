@@ -1,8 +1,21 @@
 {
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000" }]
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "backend/*"
+    }
+  }
 }

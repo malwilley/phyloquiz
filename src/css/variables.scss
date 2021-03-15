@@ -44,6 +44,7 @@ $sans-serif-font: 'Open Sans', sans-serif;
 $bg-image-filter: url(#bg-image-blur) brightness(95%) saturate(95%);
 
 $box-shadow-small: 0 0.15rem 0.3rem 0 rgba($dark-600, 0.25);
+$box-shadow-medium: 0 0.5rem 1rem 0 rgba($dark-600, 0.25);
 $box-shadow-card-no-outline: 0 1rem 1rem -1rem rgba($dark-600, 0.05),
   0 1.5rem 1.5rem 0 rgba($dark-600, 0.05);
 $box-shadow-card: inset 0 0 0 1px $light-border-color,
@@ -51,6 +52,9 @@ $box-shadow-card: inset 0 0 0 1px $light-border-color,
 
 $sans-serif-size-small: 0.7rem;
 $sans-serif-size-medium: 1rem;
+
+$z-index-notifications: 100;
+$z-index-next-footer: 5;
 
 @mixin text-style-caps {
   text-transform: uppercase;

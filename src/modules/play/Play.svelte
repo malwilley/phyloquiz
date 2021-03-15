@@ -10,13 +10,13 @@
   import PlayHeader from './PlayHeader.svelte'
   import { onMount } from 'svelte'
 
-  export let ott
+  export let uuid
 
   onMount(() => {
     window.scrollTo(0, 0)
 
-    if (ott) {
-      actions.startQuiz(ott)
+    if (uuid) {
+      actions.getQuiz(uuid)
     }
   })
 </script>
@@ -70,8 +70,16 @@
         <NextFooter />
       </div>
     </div>
-    <div slot="fetching" class="loading" out:fade>
-      <PhyloLoader>Generating quiz...</PhyloLoader>
+    <div class="loading" slot="fetching" out:fade>
+      <PhyloLoader>Retrieving quiz...</PhyloLoader>
+    </div>
+    <div class="center-content" slot="error">
+      <div class="error-content">
+        <p class="error">Something went wrong while retrieving your quiz.</p>
+        <button class="button" on:click={() => actions.getQuiz(uuid)}
+          >Click to try again</button
+        >
+      </div>
     </div>
   </MapHttpUnion>
 </div>

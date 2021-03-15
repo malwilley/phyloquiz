@@ -21,14 +21,14 @@
         return {
           show: true,
           label: allQuestionsCompleted ? 'Review' : 'Next question',
-          action: () => actions.nextQuestion(),
+          action: () => actions.nextQuestion2(),
         }
       case 'question':
         return {
           show: !isNil(selectedSpecies),
           label: 'Check answer',
           status: currentAnswer.type,
-          action: () => actions.checkAnswer(),
+          action: () => actions.submitAnswer(),
         }
       case 'summary':
       default:
@@ -57,11 +57,6 @@
       {:else}
         <Arrow direction="right" />
       {/if}
-      {#if props.status === 'error'}
-        <div class="error error-text" role="alert">
-          Something went wrong. Please try again.
-        </div>
-      {/if}
     </button>
   </div>
 </div>
@@ -78,9 +73,7 @@
     background-color: white;
     height: 5.5rem;
     border-top: 1px solid $light-border-color;
-    // box-shadow: 0 -0.25rem 0.25rem -0.25rem rgba($dark-600, 0.025),
-    //   0 -0.5rem 0.5rem 0 rgba($dark-600, 0.025);
-    z-index: 100;
+    z-index: $z-index-next-footer;
 
     transform: translateY(0);
 
@@ -109,14 +102,5 @@
     @include for-tablet-portrait-up {
       width: auto;
     }
-  }
-
-  .error {
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0;
-    width: calc(100vw - 2rem);
-    text-align: right;
-    font-size: 0.75rem;
   }
 </style>

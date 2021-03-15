@@ -39,7 +39,7 @@ export const actions = {
       searchedNodes.set({ type: 'success', data: nodes, query })
     } catch (e) {
       console.error(e)
-      featuredNodes.set({ type: 'error', message: e.message })
+      searchedNodes.set({ type: 'error', message: 'Search request failed.' })
     }
   },
 

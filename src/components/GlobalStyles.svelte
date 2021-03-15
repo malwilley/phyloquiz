@@ -145,7 +145,8 @@
 
     &:focus,
     &:active,
-    &:hover {
+    &:hover,
+    &:visited {
       color: white;
       text-decoration: none;
     }

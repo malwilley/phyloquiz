@@ -1,7 +1,9 @@
 import { writable, derived, get } from 'svelte/store'
-import { all, dropLast, update, zipWith } from 'ramda'
-import { fetchQuestion } from '../../api/questions'
-import { fetchAnswer } from '../../api/answer'
+import { all, range, update, zipWith } from 'ramda'
+import { getQuiz } from '../../api/getQuiz'
+import { getNextQuestion } from '../../api/getNextQuestion'
+import { submitAnswer } from '../../api/submitAnswer'
+import { actions as notificationActions } from '../notification/store'
 
 export const numQuestions = 5
 
@@ -9,12 +11,17 @@ const notAsked = { type: 'notAsked' }
 const fetching = { type: 'fetching' }
 const emptySelections = Array(numQuestions).fill(null)
 
-export const ott = writable(null)
 export const quizInfo = writable(notAsked)
 export const questions = writable([])
 export const answers = writable(emptySelections)
 export const selections = writable([])
 
+export const quizOtt = derived(quizInfo, ($quizInfo) =>
+  $quizInfo.type === 'success' ? $quizInfo.data.ott : null,
+)
+export const quizUuid = derived(quizInfo, ($quizInfo) =>
+  $quizInfo.type === 'success' ? $quizInfo.data.uuid : null,
+)
 export const questionIndex = derived(
   questions,
   ($questions) => $questions.length - 1,
@@ -85,7 +92,14 @@ export const questionAnswerSummary = derived(
         const question = questionUnion.data
         const answer = answerUnion.data
 
-        return { question, answer }
+        return {
+          ...question,
+          correct: answer.correct,
+          selected:
+            answer.selected === question.leaf1.ott
+              ? question.leaf1
+              : question.leaf2,
+        }
       },
       $questions,
       $answers,
@@ -94,52 +108,90 @@ export const questionAnswerSummary = derived(
 )
 
 export const actions = {
-  startQuiz: async (incomingOtt) => {
-    ott.set(incomingOtt)
+  getQuiz: async (uuid) => {
+    if (uuid === get(quizUuid)) {
+      return
+    }
 
-    actions.playAgain()
-  },
-
-  selectSpecies: (leaf) => {
-    const index = get(questionIndex)
-    selections.update(($selections) => update(index, leaf, $selections))
-  },
-
-  generateQuestion: async () => {
-    const quizOtt = get(ott)
-    const index = get(questionIndex)
-    questions.update(update(index, fetching))
+    // Reset state
+    quizInfo.set(fetching)
+    questions.set([])
+    answers.set(emptySelections)
+    selections.set(emptySelections)
 
     try {
-      const questionResponse = await fetchQuestion(quizOtt)
+      const { quiz, nextQuestion, completedQuestions } = await getQuiz(uuid)
 
-      if (quizInfo.type !== 'success') {
-        quizInfo.set({
+      quizInfo.set({
+        type: 'success',
+        data: {
+          title: quiz.vernacular || quiz.name,
+          uuid: quiz.uuid,
+          ott: quiz.ott,
+        },
+      })
+
+      questions.set([
+        ...completedQuestions.map((question) => ({
           type: 'success',
-          data: { title: questionResponse.quizTitle },
-        })
-      }
-
-      questions.update(($questions) => [
-        ...dropLast(1, $questions),
-        { type: 'success', data: questionResponse },
+          data: {
+            leafCompare: question.compare,
+            leaf1: question.option1,
+            leaf2: question.option2,
+          },
+        })),
+        ...(nextQuestion
+          ? [
+              {
+                type: 'success',
+                data: {
+                  leafCompare: nextQuestion.compare,
+                  leaf1: nextQuestion.option1,
+                  leaf2: nextQuestion.option2,
+                },
+              },
+            ]
+          : [notAsked]), // make this more explicit
+      ])
+      answers.set([
+        ...completedQuestions.map(({ correct, selected }) => ({
+          type: 'success',
+          data: { correct, selected },
+        })),
+        ...range(0, numQuestions - completedQuestions.length).map(() => null),
       ])
     } catch (e) {
       console.error(e)
-      questions.update(($questions) => [
-        ...dropLast(1, $questions),
-        { type: 'error', message: e.message },
-      ])
+      quizInfo.set({
+        type: 'error',
+        message: 'Something went wrong while retrieving your quiz.',
+      })
     }
   },
 
-  nextQuestion: async () => {
+  nextQuestion2: async () => {
+    const uuid = get(quizUuid)
     questions.update(($questions) => [...$questions, fetching])
+    const index = get(questionIndex)
 
-    await actions.generateQuestion()
+    try {
+      const question = await getNextQuestion(uuid)
+
+      questions.update(($questions) =>
+        update(index, { type: 'success', data: question }, $questions),
+      )
+    } catch {
+      console.error(e)
+      questions.update(($questions) =>
+        update(index, { type: 'error', message: e.message }, $questions),
+      )
+      notificationActions.pushNotification({
+        message: 'Something went wrong. Please try again.',
+      })
+    }
   },
 
-  checkAnswer: async () => {
+  submitAnswer: async () => {
     const question = get(currentQuestion)
     const selectedSpecies = get(currentSelection)
     const { leafCompare, leaf1, leaf2 } = question.data
@@ -154,11 +206,10 @@ export const actions = {
         additionalCloseAncestors,
         additionalFarAncestors,
         correct,
-      } = await fetchAnswer({
-        leafCompareId: leafCompare.id,
-        leaf1Id: leaf1.id,
-        leaf2Id: leaf2.id,
-        userChoice: selectedSpecies.id,
+      } = await submitAnswer({
+        quizUuid: get(quizUuid),
+        questionNumber: get(questionNumber),
+        selectedOtt: selectedSpecies.ott,
       })
 
       const pair1 = { leaf: leaf1, ancestor: leaf1Ancestor }
@@ -178,7 +229,21 @@ export const actions = {
     } catch (e) {
       console.error(e)
       answers.update(update(answerIndex, { type: 'error', message: e.message }))
+      notificationActions.pushNotification({
+        message: 'Something went wrong. Please try again.',
+      })
     }
+  },
+
+  startQuiz: async (incomingOtt) => {
+    ott.set(incomingOtt)
+
+    actions.playAgain()
+  },
+
+  selectSpecies: (leaf) => {
+    const index = get(questionIndex)
+    selections.update(($selections) => update(index, leaf, $selections))
   },
 
   playAgain: () => {

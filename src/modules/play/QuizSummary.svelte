@@ -1,5 +1,5 @@
 <script>
-  import { actions, numQuestions, score, questionAnswerSummary } from './store'
+  import { numQuestions, score, questionAnswerSummary, quizOtt } from './store'
   import InlineSpecies from './InlineSpecies.svelte'
   import { onMount } from 'svelte'
   import CenterContent from '../../components/CenterContent.svelte'
@@ -25,34 +25,31 @@
       <div class="numerator">{$score}</div>
       <div class="denominator">/{numQuestions}</div>
     </div>
-    <button class="button play-again" on:click={() => actions.playAgain()}
-      ><Play /><span>Play again?</span></button
-    >
-    <a class="button secondary go-home" use:link href="/"
-      >Or find something new</a
-    >
+    <a class="button play-again" href={`/generate/${$quizOtt}`}>
+      <Play />
+      <span>Play again?</span>
+    </a>
+    <a class="button secondary go-home" use:link href="/">
+      Or find something new
+    </a>
   </div>
   <h2>Your answers</h2>
   <ol>
-    {#each $questionAnswerSummary as { question, answer }, i}
+    {#each $questionAnswerSummary as { leafCompare, leaf1, leaf2, selected, correct }, i}
       <li class="question-answer">
         <h3>Question {i + 1}</h3>
         <div class="question">
           Is
-          <InlineSpecies leaf={question.leafCompare} />
+          <InlineSpecies leaf={leafCompare} />
           more closely related to
-          <InlineSpecies leaf={question.leaf1} />
+          <InlineSpecies leaf={leaf1} />
           or
-          <InlineSpecies leaf={question.leaf2} />
+          <InlineSpecies leaf={leaf2} />
           ?
         </div>
         <div class="answer">
-          <div
-            class="answer-symbol"
-            class:correct={answer.correct}
-            class:incorrect={!answer.correct}
-          >
-            {#if answer.correct}
+          <div class="answer-symbol" class:correct class:incorrect={!correct}>
+            {#if correct}
               <span class="visually-hidden">You were correct.</span>
               <Check aria-hidden />
             {:else}
@@ -61,7 +58,7 @@
             {/if}
           </div>
           You selected
-          <InlineSpecies leaf={answer.selected.leaf} />
+          <InlineSpecies leaf={selected} />
         </div>
       </li>
     {/each}

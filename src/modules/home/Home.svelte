@@ -13,7 +13,7 @@
   })
 </script>
 
-<div class="main" transition:fade>
+<div class="main" in:fade>
   <section class="search-hero">
     <h1 class="large-text">Generate a quiz from any category of life.</h1>
     <QuizSearch />
@@ -49,7 +49,11 @@
                       {node.numSpecies.toLocaleString()}
                       playable species
                     </div>
-                    <a class="quiz-card-play" href="/play/{node.ott}" use:link>
+                    <a
+                      class="quiz-card-play"
+                      href="/generate/{node.ott}"
+                      use:link
+                    >
                       Play
                     </a>
                   </div>

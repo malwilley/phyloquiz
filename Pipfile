@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 mysql-connector-python = "*"
+nanoid = "*"
+flask = "*"
 
 [dev-packages]
 
