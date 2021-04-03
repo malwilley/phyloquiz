@@ -7,14 +7,17 @@
   import GlobalStyles from './GlobalStyles.svelte'
   import BackgroundImageBlurSvg from './BackgroundImageBlurSvg.svelte'
   import Notifications from '../modules/notification/Notifications.svelte'
+  import { fade } from 'svelte/transition'
 </script>
 
 <GlobalStyles />
 <Router>
   <Route path="/"><Home /></Route>
-  <Route path="/generate/:ott" let:params
-    ><GenerateQuiz ott={params.ott} /></Route
-  >
+  <Route path="/generate/:ott" let:params>
+    <div out:fade>
+      <GenerateQuiz ott={params.ott} />
+    </div>
+  </Route>
   <Route path="/quiz/:uuid" let:params><Play uuid={params.uuid} /></Route>
   <Route path="*"><NotFound /></Route>
 </Router>

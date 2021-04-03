@@ -4,7 +4,6 @@
   import PhyloLoader from '../../components/PhyloLoader.svelte'
   import { navigate } from 'svelte-routing'
   import { actions } from './store'
-  import { fade } from 'svelte/transition'
 
   export let ott
 
@@ -22,7 +21,7 @@
 </script>
 
 {#await generatePromise}
-  <div class="loading" out:fade>
+  <div class="loading">
     <PhyloLoader>Generating quiz...</PhyloLoader>
   </div>
 {:catch}
