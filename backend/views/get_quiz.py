@@ -13,6 +13,7 @@ def get_quiz(quiz_uuid):
             "num_questions": quiz["num_questions"],
             "name": quiz["name"],
             "vernacular": quiz["vernacular"],
+            "ott": quiz["ott"],
         },
         "next_question": quiz_questions.get_next_question_for_quiz(quiz),
         "completed_questions": quiz_questions.get_completed_questions(quiz_uuid),

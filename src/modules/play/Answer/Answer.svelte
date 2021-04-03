@@ -10,6 +10,8 @@
   import isPhoneViewport from '../../../utils/isPhoneViewport'
   import Check from '../../../components/icons/Check.svelte'
   import Times from '../../../components/icons/Times.svelte'
+  import RateQuestion from './RateQuestion.svelte'
+  import InlineSpecies from '../InlineSpecies.svelte'
 
   onMount(() => {
     if (isSmoothScrollingSupported()) {
@@ -58,6 +60,16 @@
     <AnswerSpeciesCard leaf={leafCompare} />
     <AnswerSpeciesCard {...getCardProps()[1]} />
   </div>
+
+  <div class="original-question">
+    Is <InlineSpecies leaf={leafCompare} />
+    more closely related to
+    <InlineSpecies leaf={leaf1} />
+    or
+    <InlineSpecies leaf={leaf2} />?
+  </div>
+
+  <RateQuestion />
 
   {#if correct}
     <div class="correct">
@@ -118,6 +130,11 @@
   @import 'src/css/variables';
   @import 'src/css/media';
 
+  .original-question {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
   .correct,
   .incorrect {
     font-size: 2rem;
@@ -125,10 +142,6 @@
     margin-top: 2rem;
     display: flex;
     align-items: center;
-
-    @include for-tablet-landscape-up {
-      margin-top: 4rem;
-    }
 
     .symbol {
       height: 2.25rem;

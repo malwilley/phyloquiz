@@ -1,5 +1,5 @@
 from flask import g
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 from .ordered_leaves import get_species_info
 from .generate import generate_quiz_question
 from backend.db import get_db
@@ -75,3 +75,28 @@ def get_next_question_for_quiz(quiz):
         "option1": get_species_info(questions[-1]["option_1_ott"]),
         "option2": get_species_info(questions[-1]["option_2_ott"]),
     }
+
+
+def get_quiz_question_by_number(quiz_uuid, question_number):
+    cursor = get_db().cursor()
+
+    cursor.execute(
+        """
+        SELECT q.id
+        FROM quizzes
+        JOIN quiz_questions q ON q.quiz_id = quizzes.id
+        LEFT JOIN quiz_answers a ON a.quiz_question_id = q.id
+        WHERE quizzes.uuid = %(quiz_uuid)s
+        ORDER BY q.created_at
+        LIMIT 1
+        OFFSET %(question_index)s
+        """,
+        {"quiz_uuid": quiz_uuid, "question_index": question_number - 1},
+    )
+
+    response = cursor.fetchall()
+
+    if not response:
+        raise NotFound()
+
+    return {"id": response[0][0]}

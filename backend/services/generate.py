@@ -53,7 +53,14 @@ def generate_quiz_question(quiz):
         """,
         {"parent_node_id": parent_node["id"]},
     )
-    node_left_response, node_right_response = cursor.fetchall()
+    response = cursor.fetchall()
+
+    if len(response) < 2:
+        print("Selected parent node has fewer than two valid node children.")
+        print(parent_node)
+        raise InternalServerError()
+
+    node_left_response, node_right_response = response
     node_left = dict(zip(["id", "leaf_left", "leaf_right"], node_left_response))
     node_right = dict(zip(["id", "leaf_left", "leaf_right"], node_right_response))
 

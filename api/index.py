@@ -13,6 +13,9 @@ from backend.views.get_featured_nodes import (
 from backend.views.get_next_quiz_question import (
     get_next_question_for_quiz_uuid as view_get_next_question,
 )
+from backend.views.rate_question import (
+    rate_question as view_rate_question,
+)
 
 app = Flask(__name__)
 
@@ -40,6 +43,18 @@ def submit_answer(uuid):
         quiz_uuid=uuid,
         selected_ott=body["selected_ott"],
         question_number=body["question_number"],
+    )
+
+
+@app.route(
+    "/api/quiz/<uuid>/questions/<question_number>/rate_question", methods=["POST"]
+)
+def rate_question(uuid, question_number):
+    body = request.get_json()
+    return view_rate_question(
+        quiz_uuid=uuid,
+        question_number=int(question_number),
+        is_good=body["is_good"],
     )
 
 

@@ -2,7 +2,13 @@
   export let size = undefined
 </script>
 
-<svg fill="none" height={size} width={size} viewBox="0 0 24 24">
+<svg
+  fill="none"
+  height={size}
+  width={size}
+  viewBox="0 0 24 24"
+  {...$$restProps}
+>
   <path
     stroke-linecap="round"
     stroke-linejoin="round"
