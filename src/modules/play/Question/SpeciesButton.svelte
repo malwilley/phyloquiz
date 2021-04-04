@@ -138,7 +138,6 @@
     border: 4px solid white;
     color: white;
     animation: puff-in-center 200ms ease-out;
-    will-change: transform, filter, opacity;
   }
 
   .name {
@@ -184,12 +183,10 @@
   @keyframes puff-in-center {
     0% {
       transform: translateZ(0) scale(2);
-      filter: blur(4px);
       opacity: 0;
     }
     100% {
       transform: translateZ(0) scale(1);
-      filter: blur(0px);
       opacity: 1;
     }
   }
