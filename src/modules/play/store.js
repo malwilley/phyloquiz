@@ -169,7 +169,7 @@ export const actions = {
     }
   },
 
-  nextQuestion2: async () => {
+  nextQuestion: async () => {
     const uuid = get(quizUuid)
     questions.update(($questions) => [...$questions, fetching])
     const index = get(questionIndex)
@@ -180,14 +180,11 @@ export const actions = {
       questions.update(($questions) =>
         update(index, { type: 'success', data: question }, $questions),
       )
-    } catch {
+    } catch (e) {
       console.error(e)
       questions.update(($questions) =>
         update(index, { type: 'error', message: e.message }, $questions),
       )
-      notificationActions.pushNotification({
-        message: 'Something went wrong. Please try again.',
-      })
     }
   },
 

@@ -21,7 +21,7 @@
         return {
           show: true,
           label: allQuestionsCompleted ? 'Review' : 'Next question',
-          action: () => actions.nextQuestion2(),
+          action: () => actions.nextQuestion(),
         }
       case 'question':
         return {
