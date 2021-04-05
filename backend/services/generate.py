@@ -21,11 +21,10 @@ def generate_quiz_question(quiz):
     # Find a parent node which has at least two direct valid quiz nodes
     cursor.execute(
         """
-        SELECT a.id, a.ott, a.name, (SELECT count(*) FROM ordered_nodes d WHERE d.real_parent = a.id AND d.num_quiz_leaves > 1) as num_valid_children
+        SELECT a.id, a.ott, a.name
         FROM ordered_nodes a
         JOIN quiz_nodes q ON q.node_id = a.id
-        WHERE a.id BETWEEN %(left_node_id)s AND %(right_node_id)s AND popularity > 0 AND real_parent >= 0
-        HAVING num_valid_children > 1
+        WHERE a.id BETWEEN %(left_node_id)s AND %(right_node_id)s AND q.can_branch
         ORDER BY power(popularity, 0.08) * rand() DESC
         LIMIT 1
         """,
@@ -40,14 +39,13 @@ def generate_quiz_question(quiz):
 
     parent_node = dict(zip(["id", "ott", "name"], parent_node_response[0]))
 
-    # Randomly pick two valid child nodes which will become node_left
-    # and node_right
+    # Randomly pick two valid child nodes which will become node_left and node_right
     cursor.execute(
         """
         SELECT n.id, n.leaf_lft, n.leaf_rgt
         FROM ordered_nodes n
         JOIN quiz_nodes q on q.node_id = n.id
-        WHERE n.real_parent = %(parent_node_id)s AND q.num_quiz_leaves > 1
+        WHERE n.real_parent = %(parent_node_id)s
         ORDER BY rand()
         LIMIT 2
         """,

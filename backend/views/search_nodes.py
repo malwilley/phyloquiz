@@ -10,7 +10,7 @@ def search_nodes(query):
     cursor.execute(
         select_node
         + """
-        WHERE v.vernacular LIKE %(query)s OR n.name LIKE %(query)s
+        WHERE (v.vernacular LIKE %(query)s OR n.name LIKE %(query)s) AND q.category_node
         GROUP BY n.id
         LIMIT 5
         """,
