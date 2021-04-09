@@ -7,7 +7,7 @@ export const httpGet = async (url) => {
 
   if (!response.ok) {
     const resp = await response.json()
-    throw new Error(resp?.message ?? 'Fetch error')
+    throw new Error(resp?.description ?? 'Fetch error')
   }
 
   const result = await response.json()
@@ -27,7 +27,7 @@ export const httpPost = async (url, body) => {
 
   if (!response.ok) {
     const resp = await response.json()
-    throw new Error(resp?.message ?? 'Post error')
+    throw new Error(resp?.description ?? 'Post error')
   }
 
   const result = await response.json()

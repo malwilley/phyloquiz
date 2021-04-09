@@ -3,7 +3,7 @@
   import CenterContent from '../../components/CenterContent.svelte'
   import PhyloLoader from '../../components/PhyloLoader.svelte'
   import { navigate } from 'svelte-routing'
-  import { actions } from './store'
+  import { actions, quizInfo } from './store'
 
   export let ott
 

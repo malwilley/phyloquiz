@@ -1,15 +1,12 @@
-from flask import g
 from werkzeug.exceptions import BadRequest
 from random import random
 from nanoid import generate
-from backend.services.ordered_leaves import get_leaf_info
-from backend.db import get_db
+from .ordered_leaves import get_leaf_info
+from sqlalchemy.sql import text
+from backend import db
 
 
 def submit_answer(quiz_uuid, selected_ott, question_number):
-    connection = get_db()
-    cursor = connection.cursor()
-
     question = get_question(quiz_uuid, question_number)
     leaf_compare = get_leaf_info(question["compare_ott"])
     leaf_1 = get_leaf_info(question["option_1_ott"])
@@ -61,8 +58,6 @@ def submit_answer(quiz_uuid, selected_ott, question_number):
         correct_ott=correct_leaf["ott"],
     )
 
-    connection.commit()
-
     return {
         "correct": correct,
         "leaf_1_ancestor": nearest_common_ancestor_1,
@@ -73,21 +68,19 @@ def submit_answer(quiz_uuid, selected_ott, question_number):
 
 
 def get_question(quiz_uuid, question_number):
-    cursor = get_db().cursor()
-
-    cursor.execute(
-        """
-        SELECT q.id, q.compare_ott, q.option_1_ott, q.option_2_ott, a.id
-        FROM quizzes
-        JOIN quiz_questions q ON q.quiz_id = quizzes.id
-        LEFT join quiz_answers a ON q.id = a.quiz_question_id
-        WHERE quizzes.uuid = %(quiz_uuid)s
-        ORDER BY q.created_at
-        """,
+    questions_response = db.session.execute(
+        text(
+            """
+            SELECT q.id, q.compare_ott, q.option_1_ott, q.option_2_ott, a.id
+            FROM quizzes
+            JOIN quiz_questions q ON q.quiz_id = quizzes.id
+            LEFT join quiz_answers a ON q.id = a.quiz_question_id
+            WHERE quizzes.uuid = :quiz_uuid
+            ORDER BY q.created_at
+            """
+        ),
         {"quiz_uuid": quiz_uuid, "offset": question_number - 1},
-    )
-
-    questions_response = cursor.fetchall()
+    ).fetchall()
 
     question_response = questions_response[question_number - 1]
 
@@ -102,36 +95,36 @@ def get_question(quiz_uuid, question_number):
 
 
 def other_common_ancestors(min_node_id, max_node_id, leaf_1_id, leaf_2_id):
-    cursor = get_db().cursor()
-
-    cursor.execute(
-        """
-        SELECT DISTINCT n.id, n.ott, n.age, n.name, v.vernacular
-        FROM (
-            SELECT n1.id, n1.ott, n1.age, n1.name
-            FROM ordered_nodes n1
-            JOIN (
-              SELECT id, ott, age, name
-              FROM ordered_nodes
-              WHERE MBRIntersects(Point(0, %(leaf_2_id)s), leaves) AND real_parent >= 0 AND id > %(min_node_id)s AND id <= %(max_node_id)s AND ott IS NOT NULL
-            ) n2 ON n1.id = n2.id
-            WHERE MBRIntersects(Point(0, %(leaf_1_id)s), leaves) AND real_parent >= 0 AND n1.id > %(min_node_id)s AND n1.id <= %(max_node_id)s AND n1.ott IS NOT NULL
-            ORDER BY n1.id DESC
-            LIMIT 2
-        ) n
-        LEFT JOIN vernacular_by_ott v ON v.ott = n.ott AND v.lang_primary = 'en' AND v.preferred
-        GROUP BY n.id
-        ORDER BY n.id DESC
-        """,
+    response = db.session.execute(
+        text(
+            """
+            SELECT DISTINCT n.id, n.ott, n.age, n.name, v.vernacular
+            FROM (
+                SELECT q1.id, q1.node_id
+                FROM quiz_nodes q1
+                JOIN ordered_nodes n on n.id = q1.node_id
+                JOIN (
+                    SELECT *
+                    FROM quiz_nodes
+                    WHERE MBRIntersects(Point(0, :leaf_2_id), spatial_leaf_ids) AND node_id > :min_node_id AND node_id <= :max_node_id
+                ) q2 ON q1.id = q2.id
+                WHERE MBRIntersects(Point(0, :leaf_1_id), q1.spatial_leaf_ids) AND q1.node_id > :min_node_id AND q1.node_id <= :max_node_id AND n.ott IS NOT NULL
+                ORDER BY q1.node_id DESC
+                LIMIT 2
+            ) q
+            JOIN ordered_nodes n ON q.node_id = n.id
+            LEFT JOIN vernacular_by_ott v ON v.ott = n.ott AND v.lang_primary = 'en' AND v.preferred
+            GROUP BY n.id
+            ORDER BY n.id DESC
+            """
+        ),
         {
             "min_node_id": min_node_id,
             "max_node_id": max_node_id,
             "leaf_1_id": leaf_1_id,
             "leaf_2_id": leaf_2_id,
         },
-    )
-
-    response = cursor.fetchall()
+    ).fetchall()
 
     nodes = [
         dict(zip(["id", "ott", "age", "name", "vernacular"], node)) for node in response
@@ -141,28 +134,28 @@ def other_common_ancestors(min_node_id, max_node_id, leaf_1_id, leaf_2_id):
 
 
 def nearest_common_ancestor(leaf_1_id, leaf_2_id):
-    cursor = get_db().cursor()
-
-    cursor.execute(
-        """
-        SELECT n.id, n.ott, n.age, n.name, v.vernacular
-        FROM (
-            SELECT distinct n1.id, n1.ott, n1.age, n1.name
-            FROM ordered_nodes n1
-            JOIN (
-              SELECT id, ott, age, name
-              FROM ordered_nodes
-              WHERE MBRIntersects(Point(0, %(leaf_2_id)s), leaves) AND real_parent >= 0
-            ) n2 ON n1.id = n2.id
-            WHERE MBRIntersects(Point(0, %(leaf_1_id)s), leaves) AND real_parent >= 0
-            ORDER BY id DESC
-            LIMIT 1
-        ) n
-        LEFT JOIN vernacular_by_ott v ON v.ott = n.ott AND v.lang_primary = 'en' AND v.preferred
-        """,
+    response = db.session.execute(
+        text(
+            """
+            SELECT DISTINCT n.id, n.ott, n.age, n.name, v.vernacular
+            FROM (
+                SELECT DISTINCT q1.id, q1.node_id
+                FROM quiz_nodes q1
+                JOIN (
+                    SELECT *
+                    FROM quiz_nodes
+                    WHERE MBRIntersects(Point(0, :leaf_2_id), spatial_leaf_ids)
+                ) q2 ON q1.id = q2.id
+                WHERE MBRIntersects(Point(0, :leaf_1_id), q1.spatial_leaf_ids)
+                ORDER BY q1.node_id DESC
+                LIMIT 1
+            ) q
+            JOIN ordered_nodes n ON n.id = q.node_id
+            LEFT JOIN vernacular_by_ott v ON v.ott = n.ott AND v.lang_primary = 'en' AND v.preferred
+            """
+        ),
         {"leaf_1_id": leaf_1_id, "leaf_2_id": leaf_2_id},
-    )
-    response = cursor.fetchall()
+    ).fetchall()
 
     if not response:
         return None
@@ -173,12 +166,10 @@ def nearest_common_ancestor(leaf_1_id, leaf_2_id):
 
 
 def save_answer_to_db(question_id, selected_ott, correct_ott):
-    cursor = get_db().cursor()
-
-    cursor.execute(
+    db.session.execute(
         """
         INSERT INTO quiz_answers (quiz_question_id, selected_ott, correct_ott)
-        VALUES (%(quiz_question_id)s, %(selected_ott)s, %(correct_ott)s)
+        VALUES (:quiz_question_id, :selected_ott, :correct_ott)
         """,
         {
             "quiz_question_id": question_id,
