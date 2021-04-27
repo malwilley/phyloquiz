@@ -45,7 +45,7 @@
                   <p class="error">
                     Something went wrong while generating your question.
                   </p>
-                  <button class="button" on:click={actions.generateQuestion}
+                  <button class="button" on:click={() => actions.nextQuestion()}
                     >Click to try again</button
                   >
                 </div>

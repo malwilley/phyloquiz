@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-mysql-connector-python = "*"
 nanoid = "*"
 flask = "*"
+flask-sqlalchemy = "*"
+geoalchemy2 = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 
