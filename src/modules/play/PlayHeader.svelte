@@ -33,8 +33,7 @@
     padding: 1rem 0 0.75rem 0;
     background-color: white;
     text-align: center;
-    box-shadow: 0 0.5rem 0.5rem -0.5rem rgba($dark-600, 0.05),
-      0 0.75rem 0.75rem 0 rgba($dark-600, 0.05);
+    box-shadow: inset 0 0 0 1px $light-border-color;
 
     animation: pop-in-top 600ms ease-out;
 

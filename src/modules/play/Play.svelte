@@ -2,7 +2,7 @@
   import Question from './Question/Question.svelte'
   import Answer from './Answer/Answer.svelte'
   import QuizSummary from './QuizSummary.svelte'
-  import { quizInfo, currentQuestion, currentPageType, actions } from './store'
+  import { quizInfo, currentQuestion, renderedPageType, actions } from './store'
   import MapHttpUnion from '../../components/MapHttpUnion.svelte'
   import { fade, fly } from 'svelte/transition'
   import PhyloLoader from '../../components/PhyloLoader.svelte'
@@ -25,16 +25,15 @@
   <MapHttpUnion value={$quizInfo}>
     <div slot="success">
       <PlayHeader />
-      <div class="play-area" in:fade={{ delay: 400 }}>
-        {#if $currentPageType === 'question'}
-          <div out:fly|local={{ x: -500 }}>
+      <div class="play-area" in:fade>
+        {#if $renderedPageType === 'question'}
+          <div
+            class="animated-container"
+            out:fly|local={{ x: -500 }}
+            on:outroend={actions.pageAnimationCompleted}
+          >
             <MapHttpUnion value={$currentQuestion}>
-              <div
-                slot="fetching"
-                class="loading"
-                in:fade={{ delay: 400 }}
-                out:fade
-              >
+              <div slot="fetching" class="loading" in:fade out:fade>
                 <PhyloLoader />
               </div>
               <div slot="success">
@@ -52,17 +51,21 @@
               </div>
             </MapHttpUnion>
           </div>
-        {:else if $currentPageType === 'answer'}
+        {:else if $renderedPageType === 'answer'}
           <div
-            in:fly|local={{ x: 500, delay: 400 }}
+            class="animated-container"
+            in:fly|local={{ x: 500 }}
             out:fly|local={{ x: -500 }}
+            on:outroend={actions.pageAnimationCompleted}
           >
             <Answer />
           </div>
-        {:else if $currentPageType === 'summary'}
+        {:else if $renderedPageType === 'summary'}
           <div
-            in:fly|local={{ x: 500, delay: 400 }}
+            class="animated-container"
+            in:fly|local={{ x: 500 }}
             out:fly|local={{ x: -500 }}
+            on:outroend={actions.pageAnimationCompleted}
           >
             <QuizSummary />
           </div>
@@ -86,6 +89,10 @@
 
 <style type="text/scss">
   @import 'src/css/variables';
+
+  .animated-container {
+    will-change: opacity, transform;
+  }
 
   .play-container {
     overflow-x: hidden;

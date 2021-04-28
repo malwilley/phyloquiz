@@ -15,6 +15,7 @@ export const quizInfo = writable(notAsked)
 export const questions = writable([])
 export const answers = writable(emptySelections)
 export const selections = writable([])
+export const renderedPageType = writable('question')
 
 export const quizOtt = derived(quizInfo, ($quizInfo) =>
   $quizInfo.type === 'success' ? $quizInfo.data.ott : null,
@@ -107,6 +108,22 @@ export const questionAnswerSummary = derived(
   },
 )
 
+const getCurrentPageTypeFromState = () => {
+  if (get(done)) {
+    return 'summary'
+  }
+
+  if (get(currentAnswer)?.type === 'success') {
+    return 'answer'
+  }
+
+  return 'question'
+}
+
+const nextPage = () => {
+  renderedPageType.set(null)
+}
+
 export const actions = {
   getQuiz: async (uuid) => {
     if (uuid === get(quizUuid)) {
@@ -118,6 +135,7 @@ export const actions = {
     questions.set([])
     answers.set(emptySelections)
     selections.set(emptySelections)
+    renderedPageType.set('question')
 
     try {
       const { quiz, nextQuestion, completedQuestions } = await getQuiz(uuid)
@@ -160,6 +178,8 @@ export const actions = {
         })),
         ...range(0, numQuestions - completedQuestions.length).map(() => null),
       ])
+
+      renderedPageType.set(getCurrentPageTypeFromState())
     } catch (e) {
       console.error(e)
       quizInfo.set({
@@ -174,12 +194,21 @@ export const actions = {
     questions.update(($questions) => [...$questions, fetching])
     const index = get(questionIndex)
 
+    if (get(allQuestionsCompleted)) {
+      nextPage()
+      return
+    }
+
     try {
       const question = await getNextQuestion(uuid)
 
-      questions.update(($questions) =>
-        update(index, { type: 'success', data: question }, $questions),
-      )
+      if (question) {
+        questions.update(($questions) =>
+          update(index, { type: 'success', data: question }, $questions),
+        )
+      }
+
+      nextPage()
     } catch (e) {
       console.error(e)
       questions.update(($questions) =>
@@ -223,6 +252,8 @@ export const actions = {
       }
 
       answers.update(update(answerIndex, { type: 'success', data }))
+
+      nextPage()
     } catch (e) {
       console.error(e)
       answers.update(update(answerIndex, { type: 'error', message: e.message }))
@@ -249,5 +280,9 @@ export const actions = {
     answers.set(emptySelections)
     selections.set(emptySelections)
     actions.nextQuestion()
+  },
+
+  pageAnimationCompleted: () => {
+    renderedPageType.set(getCurrentPageTypeFromState())
   },
 }
