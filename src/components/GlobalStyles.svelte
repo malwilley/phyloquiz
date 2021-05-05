@@ -197,4 +197,11 @@
     font-family: $sans-serif-font;
     color: $text-color-error;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-delay: 0ms !important;
+      animation-duration: 1ms !important;
+    }
+  }
 </style>
