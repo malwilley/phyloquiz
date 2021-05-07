@@ -33,7 +33,7 @@
             on:outroend={actions.pageAnimationCompleted}
           >
             <MapHttpUnion value={$currentQuestion}>
-              <div slot="fetching" class="loading" in:fade out:fade>
+              <div slot="fetching" class="loading-question" out:fade>
                 <PhyloLoader />
               </div>
               <div slot="success">
@@ -118,10 +118,14 @@
   }
 
   .loading {
-    position: absolute;
-    left: 0;
+    position: fixed;
+    left: 50%;
     top: 50%;
-    width: 100%;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
+  }
+
+  .loading-question {
+    height: 10rem;
+    margin-top: 10rem;
   }
 </style>

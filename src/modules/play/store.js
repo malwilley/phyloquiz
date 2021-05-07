@@ -194,8 +194,9 @@ export const actions = {
     questions.update(($questions) => [...$questions, fetching])
     const index = get(questionIndex)
 
+    nextPage()
+
     if (get(allQuestionsCompleted)) {
-      nextPage()
       return
     }
 
@@ -207,8 +208,6 @@ export const actions = {
           update(index, { type: 'success', data: question }, $questions),
         )
       }
-
-      nextPage()
     } catch (e) {
       console.error(e)
       questions.update(($questions) =>
