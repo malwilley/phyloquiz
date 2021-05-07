@@ -11,6 +11,7 @@
 
 <style type="text/scss">
   @import 'src/css/variables';
+  @import 'src/css/media';
 
   .echo-pillarbox {
     position: relative;
@@ -26,6 +27,10 @@
     width: 100%;
     transform: translateY(-50%);
     pointer-events: none;
+
+    @include for-phone-only {
+      filter: brightness(50%) saturate(30%);
+    }
   }
 
   .foreground-image {
