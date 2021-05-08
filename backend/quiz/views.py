@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.exceptions import BadRequest, NotFound
 from nanoid import generate
+from sqlalchemy import and_
 from sqlalchemy.sql import text
 from backend.quiz.submit_answer import submit_answer
 from backend.quiz import quiz_questions
@@ -24,10 +25,16 @@ def create_quiz():
     # Get node data for  the passed in OTT
     top_node = (
         db.session.query(Node.id, Node.name, Vernacular.vernacular)
-        .join(Vernacular, Vernacular.ott == Node.ott)
+        .join(
+            Vernacular,
+            and_(
+                Vernacular.ott == Node.ott,
+                Vernacular.lang_primary == "en",
+                Vernacular.preferred,
+            ),
+            isouter=True,
+        )
         .where(Node.ott == quiz_ott)
-        .where(Vernacular.lang_primary == "en")
-        .where(Vernacular.preferred)
         .first()
     )
 
@@ -57,12 +64,14 @@ def get_quiz(uuid):
         .join(Node, Node.ott == Quiz.ott)
         .join(
             Vernacular,
-            Vernacular.ott == Quiz.ott,
+            and_(
+                Vernacular.ott == Node.ott,
+                Vernacular.lang_primary == "en",
+                Vernacular.preferred,
+            ),
             isouter=True,
         )
         .where(Quiz.uuid == uuid)
-        .where(Vernacular.lang_primary == "en")
-        .where(Vernacular.preferred)
         .first()
     )
 

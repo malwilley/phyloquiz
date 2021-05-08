@@ -3,7 +3,7 @@ from werkzeug.exceptions import NotFound
 from backend.utils import make_thumbnail_url
 from backend import db
 from backend.models import Leaf, Vernacular, Image, Iucn
-from sqlalchemy import distinct
+from sqlalchemy import distinct, and_
 
 
 def get_species_info(ott):
@@ -11,11 +11,17 @@ def get_species_info(ott):
         db.session.query(Leaf, Image, Vernacular, Iucn)
         .distinct(Leaf.id)
         .join(Image, Image.ott == Leaf.ott)
-        .join(Vernacular, Vernacular.ott == Leaf.ott, isouter=True)
+        .join(
+            Vernacular,
+            and_(
+                Vernacular.ott == Leaf.ott,
+                Vernacular.lang_primary == "en",
+                Vernacular.preferred,
+            ),
+            isouter=True,
+        )
         .join(Iucn, Iucn.ott == Leaf.ott, isouter=True)
         .where(Leaf.ott == ott)
-        .where(Vernacular.lang_primary == "en")
-        .where(Vernacular.preferred)
         .first()
     )
 
