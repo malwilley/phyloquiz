@@ -1,21 +1,11 @@
 <script>
   import { numQuestions, score, questionAnswerSummary, quizOtt } from './store'
   import InlineSpecies from './InlineSpecies.svelte'
-  import { onMount } from 'svelte'
   import CenterContent from '../../components/CenterContent.svelte'
   import Check from '../../components/icons/Check.svelte'
   import Times from '../../components/icons/Times.svelte'
   import Play from '../../components/icons/Play.svelte'
   import { link } from 'svelte-routing'
-  import isSmoothScrollingSupported from '../../utils/isSmoothScrollingSupported'
-
-  onMount(() => {
-    if (isSmoothScrollingSupported()) {
-      window.scroll({ top: 0, behavior: 'smooth' })
-    } else {
-      window.scroll(0, 0)
-    }
-  })
 </script>
 
 <CenterContent>

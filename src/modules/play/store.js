@@ -4,6 +4,7 @@ import { getQuiz } from '../../api/getQuiz'
 import { getNextQuestion } from '../../api/getNextQuestion'
 import { submitAnswer } from '../../api/submitAnswer'
 import { actions as notificationActions } from '../notification/store'
+import isSmoothScrollingSupported from '../../utils/isSmoothScrollingSupported'
 
 export const numQuestions = 5
 
@@ -122,6 +123,12 @@ const getCurrentPageTypeFromState = () => {
 
 const nextPage = () => {
   renderedPageType.set(null)
+
+  if (isSmoothScrollingSupported()) {
+    window.scroll({ top: 0, behavior: 'smooth' })
+  } else {
+    window.scroll(0, 0)
+  }
 }
 
 export const actions = {

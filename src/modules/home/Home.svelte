@@ -9,6 +9,7 @@
   import Footer from './Footer.svelte'
 
   onMount(() => {
+    window.scrollTo(0, 0)
     actions.fetchFeatured()
   })
 </script>

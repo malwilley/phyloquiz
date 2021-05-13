@@ -4,22 +4,12 @@
   import AnswerExplanationFar from './AnswerExplanationFar.svelte'
   import CenterContent from '../../../components/CenterContent.svelte'
   import { currentAnswer, currentQuestion } from '../store'
-  import { onMount } from 'svelte'
-  import isSmoothScrollingSupported from '../../../utils/isSmoothScrollingSupported'
   import InlineTreeViewer from './InlineTreeViewer.svelte'
   import isPhoneViewport from '../../../utils/isPhoneViewport'
   import Check from '../../../components/icons/Check.svelte'
   import Times from '../../../components/icons/Times.svelte'
   import RateQuestion from './RateQuestion.svelte'
   import InlineSpecies from '../InlineSpecies.svelte'
-
-  onMount(() => {
-    if (isSmoothScrollingSupported()) {
-      window.scroll({ top: 0, behavior: 'smooth' })
-    } else {
-      window.scroll(0, 0)
-    }
-  })
 
   const shouldShowSelectedFirst = isPhoneViewport()
 

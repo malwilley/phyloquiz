@@ -6,21 +6,12 @@
   import InlineSpecies from '../InlineSpecies.svelte'
   import { fade } from 'svelte/transition'
   import isSmoothScrollingSupported from '../../../utils/isSmoothScrollingSupported'
-  import { onMount } from 'svelte'
 
   export let leafData = {}
 
   let ref
 
   const { leafCompare, leaf1, leaf2 } = leafData
-
-  onMount(() => {
-    if (isSmoothScrollingSupported()) {
-      window.scroll({ top: 0, behavior: 'smooth' })
-    } else {
-      window.scroll(0, 0)
-    }
-  })
 
   const scrollToQuestion = () => {
     if (ref && ref.scrollIntoView && isSmoothScrollingSupported()) {
