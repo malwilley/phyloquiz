@@ -8,6 +8,10 @@
   const title = $quizInfo?.data?.title ?? 'Unknown'
 </script>
 
+<svelte:head>
+  <title>{title} - PhyloQuiz</title>
+</svelte:head>
+
 <div class="header">
   <a class="exit-link" aria-label="Exit quiz" href="/" use:link><Times /></a>
   <CenterContent>

@@ -7,6 +7,10 @@
   <a href="/" use:link>Go home</a>
 </div>
 
+<svelte:head>
+  <title>404 - PhyloQuiz</title>
+</svelte:head>
+
 <style lange="scss">
   .center {
     position: absolute;

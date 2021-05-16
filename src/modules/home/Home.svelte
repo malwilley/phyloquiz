@@ -14,6 +14,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>PhyloQuiz</title>
+</svelte:head>
+
 <div class="main" in:fade>
   <section class="search-hero">
     <h1 class="large-text">Generate a quiz from any category of life.</h1>
