@@ -218,7 +218,7 @@
   @import 'src/css/variables';
   @import 'src/css/media';
 
-  $default-shadow: 0 0.5rem 1rem rgba($dark-600, 0.1);
+  $default-shadow: $box-shadow-card;
 
   .wrapper {
     grid-area: search;
@@ -243,8 +243,7 @@
     margin: 0 2rem;
 
     &:focus-within {
-      box-shadow: $default-shadow, 0 0 0 1px $primary-60,
-        0 0 0 0.5rem rgba($primary-60, 0.3);
+      box-shadow: $default-shadow, 0 0 0 0.5rem rgba($primary-60, 0.3);
     }
 
     @include for-tablet-portrait-up {

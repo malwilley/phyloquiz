@@ -131,10 +131,7 @@
     padding: 0 2rem;
     height: 3.25rem;
     font-weight: bold;
-    transition: box-shadow 200ms ease-out, background-color 200ms ease-out;
-
-    box-shadow: 0 0.25rem 0.25rem 0 rgba($dark-600, 0.1),
-      0 0.5rem 0.5rem 0 rgba($dark-600, 0.05);
+    transition: box-shadow 200ms, background-color 200ms;
 
     &:disabled {
       background-color: $dark-50;
@@ -151,18 +148,16 @@
       text-decoration: none;
     }
 
-    &:enabled:hover {
+    &:not(:disabled):hover {
       background-color: lighten($primary-90, 5%);
     }
 
-    &:enabled:active {
+    &:not(:disabled):active {
       background-color: darken($primary-90, 5%);
     }
 
-    &:enabled:focus {
-      box-shadow: 0 0 0 6px $primary-30,
-        0 0.25rem 0.25rem 0 rgba($dark-600, 0.1),
-        0 0.5rem 0.5rem 0 rgba($dark-600, 0.05);
+    &:not(:disabled):focus {
+      box-shadow: 0 0 0 6px $primary-30;
     }
 
     // Secondary styles
@@ -170,10 +165,20 @@
       background: none;
       color: $text-color-light;
       box-shadow: none;
-      transition: color 200ms ease-out;
+      transition: box-shadow 200ms, background-color 200ms, color 200ms;
 
-      &:hover {
+      &:not(:disabled):hover {
+        background-color: transparent;
         color: $text-color-dark;
+      }
+
+      &:not(:disabled):active {
+        background-color: $dark-10;
+        color: $text-color-dark;
+      }
+
+      &:not(:disabled):focus {
+        background-color: $dark-10;
       }
     }
 

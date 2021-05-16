@@ -102,10 +102,6 @@
     &.incorrect {
       box-shadow: 0 0 0 12px $error-30;
     }
-
-    @include for-phone-only {
-      box-shadow: inset 0 0 0 1px $dark-20;
-    }
   }
 
   .text-container {

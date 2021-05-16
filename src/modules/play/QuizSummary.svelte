@@ -9,7 +9,7 @@
 </script>
 
 <CenterContent>
-  <div class="top">
+  <div class="card score-card">
     <div class="score-text">Final score</div>
     <div class="score">
       <div class="numerator">{$score}</div>
@@ -26,7 +26,7 @@
   <h2>Your answers</h2>
   <ol>
     {#each $questionAnswerSummary as { leafCompare, leaf1, leaf2, selected, correct }, i}
-      <li class="question-answer">
+      <li class="card question-answer">
         <h3>Question {i + 1}</h3>
         <div class="question">
           Is
@@ -59,17 +59,20 @@
   @import 'src/css/variables';
   @import 'src/css/media';
 
-  .top {
+  .score-card {
+    margin: 4rem auto;
+    padding: 2rem;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 8rem 0;
     text-align: center;
   }
 
   .score-text {
     @include text-style-caps;
     color: $text-color-light;
+    margin-bottom: 1rem;
   }
 
   .score {
@@ -111,31 +114,30 @@
   h2 {
     font-size: 2rem;
     font-weight: bold;
-    margin-top: 2rem;
+    margin: 2rem 0 1rem 0;
   }
 
   .question-answer {
     list-style: none;
     font-size: 1rem;
     line-height: 2;
+    padding: 1rem;
+    margin-bottom: 1rem;
 
     h3 {
       @include text-style-caps;
-      margin: 2rem 0 0.75rem 0;
       color: $text-color-light;
+      margin-bottom: 0.5rem;
     }
 
     @include for-tablet-portrait-up {
       font-size: 1.1rem;
+      padding: 1rem 1.5rem;
     }
   }
 
   .answer {
-    margin: 1rem 0 0 2rem;
-
-    @include for-tablet-portrait-up {
-      margin: 1rem 0 0 4rem;
-    }
+    margin-top: 1rem;
   }
 
   .answer-symbol {

@@ -58,8 +58,6 @@
   .image-card {
     height: 150px;
     width: 150px;
-    box-shadow: 0 1rem 2rem rgba($dark-600, 0.15),
-      0 0.2rem 0.5rem rgba($dark-600, 0.1), 0 0 0 1px rgba($dark-600, 0.05);
   }
 
   .image {

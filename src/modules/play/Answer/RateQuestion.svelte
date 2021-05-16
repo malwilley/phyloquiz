@@ -82,7 +82,7 @@
     font-size: $sans-serif-size-medium;
     line-height: 4rem;
 
-    box-shadow: 0 0 1rem 0 rgba($dark-600, 0.08);
+    box-shadow: $box-shadow-card;
     background: white;
 
     overflow: visible;

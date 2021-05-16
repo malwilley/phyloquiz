@@ -9,7 +9,7 @@
 </script>
 
 <div class="header">
-  <a class="exit-link" href="/" use:link><Times /></a>
+  <a class="exit-link" aria-label="Exit quiz" href="/" use:link><Times /></a>
   <CenterContent>
     <div class="title">{title}</div>
     <div class="progress-text">
@@ -54,6 +54,7 @@
     width: 3rem;
     border-radius: 50%;
     background-color: white;
+    transition: color 200ms, box-shadow 200ms, background-color 200ms;
 
     &:hover,
     &:focus {
@@ -61,8 +62,13 @@
       background-color: $light-hover;
     }
 
+    &:focus {
+      box-shadow: 0 0 0 6px $primary-30;
+    }
+
     &:active {
       background-color: $dark-10;
+      box-shadow: 0 0 0 6px $primary-30;
     }
 
     :global(svg) {

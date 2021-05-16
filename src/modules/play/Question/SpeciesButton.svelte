@@ -81,8 +81,7 @@
       height: 20rem;
       padding-bottom: 3rem;
 
-      box-shadow: 0 1rem 1rem -1rem rgba($dark-600, 0.05),
-        0 1.5rem 1.5rem 0 rgba($dark-600, 0.05);
+      box-shadow: $box-shadow-card;
       border-radius: 1rem;
 
       &:first-child {
@@ -114,8 +113,7 @@
     border-radius: 1rem;
     pointer-events: none;
     transition: box-shadow 150ms;
-    box-shadow: 0 1rem 2rem rgba($dark-600, 0.15),
-      0 0.2rem 0.5rem rgba($dark-600, 0.1), 0 0 0 1px rgba($dark-600, 0.05);
+    box-shadow: $box-shadow-card;
 
     @include for-tablet-portrait-up {
       box-shadow: 0 0.25rem 0.25rem 0.1rem rgba($dark-600, 0.15),
@@ -162,9 +160,7 @@
 
     font-family: $serif-font;
 
-    box-shadow: inset 0 0 0 1px $dark-20,
-      0 1rem 1rem -1rem rgba($dark-600, 0.05),
-      0 1.5rem 1.5rem 0 rgba($dark-600, 0.05);
+    box-shadow: $box-shadow-card;
     font-size: 0.9rem;
 
     @include for-tablet-portrait-up {

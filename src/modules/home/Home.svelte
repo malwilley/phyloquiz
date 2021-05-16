@@ -79,6 +79,8 @@
 
   .main {
     min-height: 100vh;
+    position: relative;
+    box-shadow: $box-shadow-card;
   }
 
   .search-hero {
@@ -116,11 +118,6 @@
     line-height: 1.25;
     text-align: center;
 
-    // To blur out background
-    background-color: rgba($primary-10, 0.5);
-    border-radius: 1rem;
-    box-shadow: 0 0 1rem $primary-10;
-
     @include for-tablet-portrait-up {
       font-size: 2.5rem;
     }
@@ -156,10 +153,10 @@
   .quiz-card {
     position: relative;
     height: auto;
-    transition: 200ms box-shadow ease-out;
+    transition: 200ms transform ease-out;
 
     &:hover {
-      box-shadow: inset 0 0 0 1px $primary-30, $box-shadow-card-no-outline;
+      transform: translateY(-2px);
     }
   }
 

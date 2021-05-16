@@ -3,6 +3,7 @@
 </script>
 
 <svg
+  aria-hidden
   fill="none"
   height={size}
   width={size}

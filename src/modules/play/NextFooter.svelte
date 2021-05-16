@@ -73,7 +73,7 @@
     background-color: white;
     height: 5.5rem;
     border-top: 1px solid $light-border-color;
-    box-shadow: 0 -0.5rem 0.5rem 0 rgba($dark-600, 0.05);
+    box-shadow: 0 -0.125rem 0.5rem rgba($dark-600, 0.1);
     z-index: $z-index-next-footer;
 
     transform: translateY(0);

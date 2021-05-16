@@ -32,7 +32,6 @@
     align-items: center;
     padding: 3rem 2rem;
     background: $primary-20;
-    border-top: 1px solid rgba($primary-60, 0.1);
 
     font-size: $sans-serif-size-small;
     line-height: 1.5;
