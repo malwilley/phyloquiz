@@ -35,7 +35,7 @@ def generate_quiz_question(quiz):
             SELECT n.id, n.leaf_lft, n.leaf_rgt
             FROM ordered_nodes n
             JOIN quiz_nodes q on q.node_id = n.id
-            WHERE n.real_parent = :parent_node_id
+            WHERE n.real_parent = :parent_node_id AND q.num_quiz_leaves > 1
             ORDER BY rand()
             LIMIT 2
             """
