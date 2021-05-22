@@ -1,5 +1,5 @@
 import { writable, derived, get } from 'svelte/store'
-import { all, range, update, zipWith } from 'ramda'
+import { all, find, range, update, zipWith } from 'ramda'
 import { getQuiz } from '../../api/getQuiz'
 import { getNextQuestion } from '../../api/getNextQuestion'
 import { submitAnswer } from '../../api/submitAnswer'
@@ -98,7 +98,7 @@ export const questionAnswerSummary = derived(
           ...question,
           correct: answer.correct,
           selected:
-            answer.selected === question.leaf1.ott
+            answer.selected?.leaf?.ott === question.leaf1.ott
               ? question.leaf1
               : question.leaf2,
         }
@@ -179,10 +179,20 @@ export const actions = {
           : [notAsked]), // make this more explicit
       ])
       answers.set([
-        ...completedQuestions.map(({ correct, selected }) => ({
-          type: 'success',
-          data: { correct, selected },
-        })),
+        ...completedQuestions.map(
+          ({ option1, option2, correct, selected: selectedOtt }) => ({
+            type: 'success',
+            data: {
+              correct,
+              selected: {
+                leaf: find(
+                  ({ ott }) => ott === selectedOtt,
+                  [option1, option2],
+                ),
+              },
+            },
+          }),
+        ),
         ...range(0, numQuestions - completedQuestions.length).map(() => null),
       ])
 
