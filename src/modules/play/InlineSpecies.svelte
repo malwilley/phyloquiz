@@ -28,6 +28,7 @@
 
     &.scientific {
       font-style: italic;
+      text-transform: none;
     }
   }
 

@@ -118,12 +118,14 @@
 
     &.scientific {
       font-style: italic;
+      text-transform: none;
     }
   }
 
   .name {
     color: $text-color-light;
     font-weight: normal;
+    text-transform: none;
     font-style: italic;
   }
 
