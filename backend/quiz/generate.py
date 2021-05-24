@@ -13,20 +13,21 @@ def generate_quiz_question(quiz):
         db.session.query(Node.id, Node.node_rgt).where(Node.ott == quiz["ott"]).first()
     )
 
-    # Find a parent node which has at least two direct valid quiz nodes
-    parent_node = (
-        db.session.query(Node.id, Node.ott, Node.name)
-        .join(QuizNode, QuizNode.node_id == Node.id)
-        .where(between(Node.id, node.id, node.node_rgt))
-        .where(QuizNode.can_branch == True)
-        .order_by(desc(func.pow(Node.popularity, 0.1) * func.rand()))
-        .first()
+    # Step 1: Pick two random leaves
+    (leaf1, leaf2) = step1_get_random_leaves(node)
+
+    # Step 2: Get most recent common ancestor node
+    common_node = step2_get_common_ancestor(leaf1, leaf2)
+
+    # Step 3: Climb up tree and attempt to find a named node that has a distinct other set of leaves
+    ancestor_common_node = step3_climb_tree_for_second_node(
+        common_node, min_node_id=node.id
     )
 
-    if not parent_node:
-        raise InternalServerError(
-            f"No suitable parent nodes for the ott: {quiz['ott']}"
-        )
+    # Step 4: Get third leaf from other branch
+    leaf3 = step4_get_third_leaf(
+        ancestor_common_node,
+    )
 
     # Randomly pick two valid child nodes which will become node_left and node_right
     result = db.session.execute(
@@ -72,6 +73,161 @@ def generate_quiz_question(quiz):
     )
 
     return question
+
+
+def step1_get_random_leaves(quiz_node):
+    leaves_response = db.session.execute(
+        text(
+            """
+            select distinct l.id, l.ott, l.name, vernacular_by_ott.vernacular, iucn.status_code, images_by_ott.src, images_by_ott.src_id, q.depth, l.popularity, l.wikidata, l.eol
+            from ordered_leaves l
+            join quiz_leaves_by_ott q on q.leaf_id = l.id
+            join images_by_ott ON (l.ott = images_by_ott.ott AND images_by_ott.best_any = 1)
+            left join vernacular_by_ott on (l.ott = vernacular_by_ott.ott and vernacular_by_ott.lang_primary = 'en' and vernacular_by_ott.preferred = 1)
+            left join iucn on l.ott = iucn.ott
+            where l.id between :leaf_left and :leaf_right and best_any = 1
+            group by l.ott
+            order by rand()
+            limit 2
+            """
+        ),
+        {
+            "leaf_left": quiz_node["leaf_left"],
+            "leaf_right": quiz_node["leaf_right"],
+        },
+    ).fetchall()
+
+    leaves = [
+        dict(
+            zip(
+                [
+                    "id",
+                    "ott",
+                    "name",
+                    "vernacular",
+                    "iucn",
+                    "img_src",
+                    "img_src_id",
+                    "depth",
+                    "popularity",
+                    "wikidata",
+                    "eol",
+                ],
+                leaf_response,
+            )
+        )
+        for leaf_response in leaves_response
+    ]
+
+    return leaves
+
+
+def step2_get_common_ancestor(leaf1, leaf2):
+    return nearest_common_ancestor(leaf1["id"], leaf2["id"])
+
+
+def nearest_common_ancestor(leaf_1_id, leaf_2_id):
+    response = db.session.execute(
+        text(
+            """
+            SELECT DISTINCT n.id, n.ott, n.age, n.name, v.vernacular
+            FROM (
+                SELECT DISTINCT q1.id, q1.node_id
+                FROM quiz_nodes q1
+                JOIN (
+                    SELECT *
+                    FROM quiz_nodes
+                    WHERE MBRIntersects(Point(0, :leaf_2_id), spatial_leaf_ids)
+                ) q2 ON q1.id = q2.id
+                WHERE MBRIntersects(Point(0, :leaf_1_id), q1.spatial_leaf_ids)
+                ORDER BY q1.node_id DESC
+                LIMIT 1
+            ) q
+            JOIN ordered_nodes n ON n.id = q.node_id
+            LEFT JOIN vernacular_by_ott v ON v.ott = n.ott AND v.lang_primary = 'en' AND v.preferred
+            """
+        ),
+        {"leaf_1_id": leaf_1_id, "leaf_2_id": leaf_2_id},
+    ).fetchall()
+
+    if not response:
+        return None
+
+    ancestor_node = dict(zip(["id", "ott", "age", "name", "vernacular"], response[0]))
+
+    return ancestor_node
+
+
+def step3_climb_tree_for_second_node(node, min_node_id):
+    response = db.session.execute(
+        text(
+            """
+            SELECT id
+            FROM ordered_nodes 
+            WHERE MBRIntersects(Point(0, :node_id), spatial_nodes) AND name IS NOT NULL AND id > :min_node_id
+            ORDER BY q1.node_id DESC
+            LIMIT 1
+            """
+        ),
+        {"node_id": node["id"], "min_node_id": min_node_id},
+    ).fetchall()
+
+    if not response:
+        print("No node after climbing")
+        return None
+
+    ancestor_node = dict(zip(["id"], response[0]))
+
+    return ancestor_node
+
+
+def step4_get_third_leaf(node, min_filtered_leaf_id, max_filtered_leaf_id):
+    leaves_response = db.session.execute(
+        text(
+            """
+            select distinct l.id, l.ott, l.name, vernacular_by_ott.vernacular, iucn.status_code, images_by_ott.src, images_by_ott.src_id, q.depth, l.popularity, l.wikidata, l.eol
+            FROM ordered_nodes n
+            JOIN ordered_leaves l ON MBRContains(Point(0, l.id), n.leaves)
+            join images_by_ott ON (l.ott = images_by_ott.ott AND images_by_ott.best_any = 1)
+            left join vernacular_by_ott on (l.ott = vernacular_by_ott.ott and vernacular_by_ott.lang_primary = 'en' and vernacular_by_ott.preferred = 1)
+            left join iucn on l.ott = iucn.ott
+            WHERE l.valid_quiz_leaf AND MBRContains(Point(0, l.id), n.leaves)
+            where l.id between :leaf_left and :leaf_right and best_any = 1
+            group by l.ott
+            order by rand()
+            limit 1
+            """
+        ),
+        {
+            "node_id": node["id"],
+            "min_filtered_leaf_id": min_filtered_leaf_id,
+            "max_filtered_leaf_id": max_filtered_leaf_id,
+        },
+    ).fetchall()
+
+    leaves = [
+        dict(
+            zip(
+                [
+                    "id",
+                    "ott",
+                    "name",
+                    "vernacular",
+                    "iucn",
+                    "img_src",
+                    "img_src_id",
+                    "depth",
+                    "popularity",
+                    "wikidata",
+                    "eol",
+                ],
+                leaf_response,
+            )
+        )
+        for leaf_response in leaves_response
+    ]
+
+    return leaves
 
 
 def generate_quiz_leaf(node, weight_depth, blacklisted_leaf_id=None):
