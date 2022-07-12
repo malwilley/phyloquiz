@@ -9,6 +9,8 @@ flask = "*"
 flask-sqlalchemy = "*"
 geoalchemy2 = "*"
 mysql-connector-python = "*"
+sentry-sdk = "*"
+blinker = "*"
 
 [dev-packages]
 

@@ -1,10 +1,10 @@
 import os
-from flask import Flask, request, g, jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import json
 import traceback
 from werkzeug.exceptions import HTTPException
-
+from sentry_sdk import capture_exception, Hub
 
 db = SQLAlchemy()
 
@@ -48,6 +48,12 @@ def create_app():
 
     @app.errorhandler(Exception)
     def handle_exception(e):
+        capture_exception(e)
+
+        client = Hub.current.client
+        if client is not None:
+            client.flush()
+
         # Pass through HTTP errors
         if isinstance(e, HTTPException):
             return e
