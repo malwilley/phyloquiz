@@ -46,6 +46,17 @@ export default {
     file: 'dist/bundle.js',
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      values: {
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        'process.env.SENTRY_DSN': JSON.stringify(process.env.SENTRY_DSN),
+        'process.env.SENTRY_TRACES_SAMPLE_RATE': JSON.stringify(
+          process.env.SENTRY_TRACES_SAMPLE_RATE,
+        ),
+      },
+    }),
+
     copy({
       targets: [{ src: 'public/**/*', dest: 'dist' }],
       hook: 'writeBundle',
@@ -96,9 +107,7 @@ export default {
       browser: true,
       dedupe: ['svelte'],
     }),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    }),
+
     commonjs(),
 
     // In dev mode, call `npm run start` once

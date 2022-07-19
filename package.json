@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "dev:vercel": "vercel dev",
     "build": "rollup -c",
@@ -16,6 +19,7 @@
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.1.1",
     "@rollup/plugin-replace": "^2.4.2",
+    "@sentry/cli": "^2.3.1",
     "postcss": "^8.2.4",
     "rollup": "^2.38.1",
     "rollup-plugin-copy": "^3.3.0",
@@ -27,10 +31,12 @@
     "sass": "^1.26.10",
     "svelte": "^3.32.0",
     "svelte-preprocess": "^4.6.5",
-    "vercel": "^21.3.2"
+    "vercel": "23"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
+    "@sentry/browser": "^7.6.0",
+    "@sentry/tracing": "^7.6.0",
     "core-js": "^3.9.0",
     "debounce": "^1.2.0",
     "nanoid": "^3.1.22",
